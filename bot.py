@@ -16,12 +16,65 @@ con = sqlite3.connect('Users.db')
 async def on_ready():
     print('connecte')
 
+@bot.command()
+async def rank(ctx):
+    i = 0
+    j = 0
+
+    arr = []
+    arr2 = []
+  
+    my_classement = []
+    
+    auteur = str(ctx.message.author)
+    auteur = "'" +auteur + "'"
+    with con:
+        curr = con.cursor()
+
+        for rank in curr.execute('SELECT name FROM USERS ORDER BY xp_ecrit DESC;'):
+            if (i <= 10):
+                i  = i + 1
+                arr.append(rank[0])
+        i = 0
+
+        for rank in curr.execute('SELECT xp_ecrit FROM USERS ORDER BY xp_ecrit DESC;'):
+            if (i <= 10):
+                i  = i + 1
+                arr2.append(rank[0])
+
+
+        i = 0
+        i = 0
+        print("-----------------------")
+        for rank in curr.execute('SELECT id FROM USERS ORDER BY xp_ecrit DESC;'):
+                i  = i + 1
+                if (rank[0] == str(ctx.message.author)):
+                    for rank in curr.execute('SELECT xp_ecrit FROM USERS ORDER BY xp_ecrit DESC;'):
+                        j = j + 1
+
+                        if (j == i):
+                            my_classement.append(j)
+                            my_classement.append(rank[0])
+
+
+        
+        print("classement :", my_classement[0],"nombre de points: " ,my_classement[1])
+        print("-----------------------")
+
+        for i in range(len(arr)):
+            print(arr[i], arr2[i])
+
+
+
 
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return()
+
     else:
+        await bot.process_commands(message)
+
         str_tmp = str(message.author)
         size = len(str_tmp)
         name = str_tmp[:size - 5]
