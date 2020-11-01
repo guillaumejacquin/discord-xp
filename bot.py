@@ -157,7 +157,7 @@ async def on_message(message):
 
                             messagee = ("Hey! " + str(message.author.name) + "Tu passes au niveau " + str(levell + 1) + ". Continue, monte comme ça et tu toucheras bientôt le soleil! pour passer niveau 10 il faut que tu passes 5h en vocal :sunglasses:")
 
-                                await client.send_message(user, messagee)
+                            await client.send_message(user, messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -331,5 +331,5 @@ async def on_member_remove(member):
 
 
 
-bot.run("token")
+bot.run("bot")
 
