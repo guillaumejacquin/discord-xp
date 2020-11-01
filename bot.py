@@ -9,12 +9,52 @@ import os
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='g', intents=intents)
+bot = commands.Bot(command_prefix='g!', intents=intents)
 con = sqlite3.connect('Users.db')
+
+channel_bans_xp = []
 
 @bot.event
 async def on_ready():
     print('connecte')
+
+# @bot.command()
+# async def coucou(ctx):
+#     with con:
+#         cur = con.cursor()
+       
+#         for row in cur.execute('SELECT * FROM USERS'):
+#             print(row)
+
+
+
+@bot.command(pass_context = True)
+async def no_channel_xp(ctx, channel_id):
+    if ctx.message.author.guild_permissions.administrator:
+        for i in range(len(channel_bans_xp)):
+            if (channel_id == channel_bans_xp[i]):
+                await ctx.send("le channel est déja sans xp ")
+                return
+        channel_bans_xp.append(channel_id)
+    else:
+        await ctx.send("tu n'as pas les droits.")
+
+
+
+@bot.command(pass_context = True)
+async def channel_xp(ctx, channel_id):
+    if ctx.message.author.guild_permissions.administrator:
+
+        for i in range(len(channel_bans_xp)):
+            # print(channel_bans_xp[i])
+            if (channel_id == channel_bans_xp[i]):
+                channel_bans_xp.remove(channel_id)
+                return
+
+        await ctx.send("le channel_id n'est pas dans la liste")
+    else:
+        await ctx.send("tu n'as pas les droits.")
+
 
 @bot.command()
 async def rank(ctx):
@@ -30,7 +70,7 @@ async def rank(ctx):
     auteur = "'" +auteur + "'"
     with con:
         curr = con.cursor()
-
+        
         for rank in curr.execute('SELECT name FROM USERS ORDER BY xp_ecrit DESC;'):
             if (i <= 10):
                 i  = i + 1
@@ -45,7 +85,6 @@ async def rank(ctx):
 
         i = 0
         i = 0
-        print("-----------------------")
         for rank in curr.execute('SELECT id FROM USERS ORDER BY xp_ecrit DESC;'):
                 i  = i + 1
                 if (rank[0] == str(ctx.message.author)):
@@ -58,11 +97,10 @@ async def rank(ctx):
 
 
         
-        print("classement :", my_classement[0],"nombre de points: " ,my_classement[1])
-        print("-----------------------")
+        await ctx.send("classement :", my_classement[0],"nombre de points: " ,my_classement[1])
 
         for i in range(len(arr)):
-            print(arr[i], arr2[i])
+            await ctx.send(arr[i], arr2[i])
 
 
 
@@ -75,13 +113,18 @@ async def on_message(message):
     else:
         await bot.process_commands(message)
 
+        if(len(channel_bans_xp) != 0):
+            for j in range(len(channel_bans_xp)):
+
+                if (int(channel_bans_xp[j]) == int(message.channel.id)):
+                    return
+
         str_tmp = str(message.author)
         size = len(str_tmp)
         name = str_tmp[:size - 5]
         name = "'" + name + "'"
         str_tmp = "'" + str_tmp + "'"
 
-        #j'arrivais pas a récupérer l'id du coup j'ai trouvé une petite arnaque 
         execut = "UPDATE USERS set id = " + str(str_tmp) +  " where name=" +  str(name)+ ";"
 
         change_xp = "UPDATE USERS set xp = xp" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
@@ -105,16 +148,14 @@ async def on_message(message):
                         length2 = len(xpp) - 3
                         levell = int(leve[1:length2])
 
-                        #row = xp
+                    
                         ##c est harcodé pour lxp mais je peux gérer pour changer ca 
-
-
 
                         if (levell < 9 and xp > 30 ):
                             change_level_ecrit = "UPDATE USERS set level_ecrit = level_ecrit" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 30" +  " where id=" +  str(str_tmp)+ ";"
 
-                            messagee = ("Hey! " + str(message.author.name) + "Tu passes au niveau " + str(levell + 1) + ". Continue, monter comme ça et tu toucheras bientôt le soleil! pour passer niveau 10 il faut que tu passes 5h en vocal :sunglasses:")
+                            messagee = ("Hey! " + str(message.author.name) + "Tu passes au niveau " + str(levell + 1) + ". Continue, monte comme ça et tu toucheras bientôt le soleil! pour passer niveau 10 il faut que tu passes 5h en vocal :sunglasses:")
 
                             await message.channel.send(messagee)
                             curr.execute(change_level_ecrit)
@@ -170,7 +211,7 @@ async def on_message(message):
                             await message.channel.send(messagee)
                             return()
 
-                        if (levell  == 49 and xp >= 200 and level_xp >= 72000):
+                        if (levell  == 49 and xp >= 200 and level_xp >= 180000):
                             change_level_ecrit = "UPDATE USERS set level_ecrit = level_ecrit" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 200" +  " where id=" +  str(str_tmp)+ ";"
 
@@ -249,8 +290,10 @@ async def on_voice_state_update(member, before, after):
                                         vall = (0.0, str(member.id))
                                         curr.execute(sqll,vall)
 
-                                        xp_gain = (time_log - name) / 60 + 1
+                                        xp_gain = (time_log - name) / 60
                                         xp_gain = round(xp_gain)
+
+                                        
 
                                         sql = ("UPDATE USERS SET xp = ? where remote = ?")
                                         data = (xp_gain + si, str(member.id))
@@ -264,6 +307,8 @@ async def on_member_join(member):
     idd = "'" + str(idd) + "'"
 
     execut = "INSERT INTO users VALUES("+ str(idd) + ","+ str(idd) + "," + str(name) + ", 1, 0, 0, 0, 0.0)"
+
+
     
     with con:
         cur = con.cursor()
@@ -277,7 +322,7 @@ async def on_member_join(member):
 async def on_member_remove(member):    
     memberr = member.id
     member = "'" + str(memberr) + "'" 
-    execut =  ("DELETE from users where remote = " + member + ";")
+    execut = ("DELETE from users where remote = " + member + ";")
 
     with con:
         cur = con.cursor()
@@ -286,6 +331,5 @@ async def on_member_remove(member):
 
 
 
-bot.run("NzY4NTI0NjU2MzA2NDIxODIx.X5BuXA.AKdfOv1Dc32RhKitPrYPjaskZXU")
-
+bot.run("token")
 
