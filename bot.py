@@ -331,5 +331,5 @@ async def on_member_remove(member):
 
 
 
-bot.run("bot")
+bot.run("token")
 
