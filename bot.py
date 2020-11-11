@@ -22,7 +22,7 @@ async def on_ready():
 # async def coucou(ctx):
 #     with con:
 #         cur = con.cursor()
-       
+
 #         for row in cur.execute('SELECT * FROM USERS'):
 #             print(row)
 
@@ -63,14 +63,14 @@ async def rank(ctx):
 
     arr = []
     arr2 = []
-  
+
     my_classement = []
-    
+
     auteur = str(ctx.message.author)
     auteur = "'" +auteur + "'"
     with con:
         curr = con.cursor()
-        
+
         for rank in curr.execute('SELECT name FROM USERS ORDER BY xp_ecrit DESC;'):
             if (i <= 10):
                 i  = i + 1
@@ -96,11 +96,13 @@ async def rank(ctx):
                             my_classement.append(rank[0])
 
 
-        
-        await ctx.send("classement :", my_classement[0],"nombre de points: " ,my_classement[1])
+        message = "classement :"+ str(my_classement[0]) + "nombre de points: " + str(my_classement[1])
+        await ctx.send(message)
+        await ctx.send("voici le top 10 des utilisateurs sur ce serveur :")
 
-        for i in range(len(arr)):
-            await ctx.send(arr[i], arr2[i])
+        for i in range(len(arr) or i < 10):
+            arr1 = str(arr[i])+ " : " + str(arr2[i]) + " points xp"
+            await ctx.send(arr1)
 
 
 
@@ -141,15 +143,15 @@ async def on_message(message):
             for xpp in curr.execute('SELECT level_ecrit FROM USERS WHERE ID = ' + str(str_tmp)):
                     for level_xp in curr.execute('SELECT xp_oral FROM USERS WHERE ID = ' + str(str_tmp)):
                         salut = str(row)
-                        lenngtf = len(salut) -2          
+                        lenngtf = len(salut) -2
                         xp = int (salut[1:lenngtf])
 
                         leve = str(xpp)
                         length2 = len(xpp) - 3
                         levell = int(leve[1:length2])
 
-                    
-                        ##c est harcodé pour lxp mais je peux gérer pour changer ca 
+
+                        ##c est harcodé pour lxp mais je peux gérer pour changer ca
 
                         if (levell < 9 and xp > 30 ):
                             change_level_ecrit = "UPDATE USERS set level_ecrit = level_ecrit" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
@@ -157,7 +159,7 @@ async def on_message(message):
 
                             messagee = ("Hey! " + str(message.author.name) + "Tu passes au niveau " + str(levell + 1) + ". Continue, monte comme ça et tu toucheras bientôt le soleil! pour passer niveau 10 il faut que tu passes 5h en vocal :sunglasses:")
 
-                            await client.send_message(user, messagee)
+                            await bpt.send_message(user, messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -225,18 +227,18 @@ async def on_message(message):
                             change_level_ecrit = "UPDATE USERS set level_ecrit = level_ecrit" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 300" +  " where id=" +  str(str_tmp)+ ";"
 
-                            messagee =(f"Salut l'ancien ! Tu passes au niveau "+ " ! Tiens donc, ne serait-ce pas un cheveux blanc qui pousse ? :older_adult:")
+                            messagee =(f"Salut l'ancien ! Tu passes au niveau "+  str(levell + 1) + " ! Tiens donc, ne serait-ce pas un cheveux blanc qui pousse ? :older_adult:")
                             await client.send_message(user, messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
 
-                        
+
                         if (levell >= 70 and xp == 1):
-                            messagee =(f (str(message.author.name)) + "! INCROYABLE ! Tu as atteint le niveau levell, c'est le niveau maximum ! Tu es devenu un dinosaure :sauropod: Du coup une récompense spéciale s'offre à toi. Envoie un message privé au fondateur ! :partying_face:")
+                            messagee =(f (str(message.author.name)) + "! INCROYABLE ! Tu as atteint le niveau 70, c'est le niveau maximum ! Tu es devenu un dinosaure :sauropod: Du coup une récompense spéciale s'offre à toi. Envoie un message privé au fondateur ! :partying_face:")
                             await client.send_message(user, messagee)
                             return()
-                        
+
 
                             #ca execute les changements sql
                             with con:
@@ -255,28 +257,28 @@ async def on_voice_state_update(member, before, after):
             for roww in curr.execute('SELECT * FROM USERS WHERE remote = ' + str(member.id)):
                     for sa in curr.execute('SELECT xp_oral FROM USERS WHERE remote = ' + str(member.id)):
                         name = float(sa[0])
-                    
+
                         sql = ("UPDATE USERS SET start_time = ? where remote = ?")
-                        
+
                         debut = time.time()
                         total = debut - name
-                        val = (total, str(member.id)) 
+                        val = (total, str(member.id))
                         curr.execute(sql, val)
 
-    #s'il se déco 
+    #s'il se déco
 
-    if after.channel is  None:  
+    if after.channel is  None:
         with con:
-            curr = con.cursor()      
+            curr = con.cursor()
             for row in curr.execute('SELECT start_time FROM USERS WHERE remote = ' + str(member.id)):
                 for xp in curr.execute('SELECT start_time FROM USERS WHERE remote = ' + str(member.id)):
                                 for sa in curr.execute('SELECT xp_oral FROM USERS WHERE remote = ' + str(member.id)):
                                     for si in curr.execute('SELECT xp FROM USERS WHERE remote = ' + str(member.id)):
 
                                         name = float(sa[0])
-                                     
+
                                         si = float(si[0])
-                                
+
                                         debut = float(row[0])
                                         fin = time.time()
                                         time_log = (fin - debut)
@@ -293,12 +295,12 @@ async def on_voice_state_update(member, before, after):
                                         xp_gain = (time_log - name) / 60
                                         xp_gain = round(xp_gain)
 
-                                        
+
 
                                         sql = ("UPDATE USERS SET xp = ? where remote = ?")
                                         data = (xp_gain + si, str(member.id))
                                         curr.execute(sql, data)
-                                        
+
 @bot.event
 async def on_member_join(member):
     name = member.name
@@ -309,7 +311,7 @@ async def on_member_join(member):
     execut = "INSERT INTO users VALUES("+ str(idd) + ","+ str(idd) + "," + str(name) + ", 1, 0, 0, 0, 0.0)"
 
 
-    
+
     with con:
         cur = con.cursor()
         cur.execute("CREATE TABLE IF NOT EXISTS users(id text  PRIMARY KEY, remote text ,name text, level_ecrit INTEGER  , xp INTEGER  , xp_ecrit INTEGER  , xp_oral, start_time float)")
@@ -319,9 +321,9 @@ async def on_member_join(member):
  # pour retirer l'xp et eviter tout probleme, si un pelo se deco reco, bah il est niveau 1 :( (je vais cdder un truc pour que le fondateur puisse mettre le level de quelqu un commpe il veut)
 
 @bot.event
-async def on_member_remove(member):    
+async def on_member_remove(member):
     memberr = member.id
-    member = "'" + str(memberr) + "'" 
+    member = "'" + str(memberr) + "'"
     execut = ("DELETE from users where remote = " + member + ";")
 
     with con:
@@ -331,5 +333,5 @@ async def on_member_remove(member):
 
 
 
-bot.run("token")
+bot.run("NzcyMDk0NzY5NTcxOTU0NzI4.X51rSQ.T8FCUkWIQsbQxrdmEk2IbZZolmo")
 
