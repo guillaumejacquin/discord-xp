@@ -18,13 +18,13 @@ channel_bans_xp = []
 async def on_ready():
     print('connecte')
 
-# @bot.command()
-# async def coucou(ctx):
-#     with con:
-#         cur = con.cursor()
+@bot.command()
+async def coucou(ctx):
+    with con:
+        cur = con.cursor()
 
-#         for row in cur.execute('SELECT * FROM USERS'):
-#             print(row)
+        for row in cur.execute('SELECT * FROM USERS'):
+            print(row)
 
 
 
@@ -159,7 +159,7 @@ async def on_message(message):
 
                             messagee = ("Hey! " + str(message.author.name) + "Tu passes au niveau " + str(levell + 1) + ". Continue, monte comme ça et tu toucheras bientôt le soleil! pour passer niveau 10 il faut que tu passes 5h en vocal :sunglasses:")
 
-                            await bpt.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -169,7 +169,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 30" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee = (str(message.author.name) + ", tu as atteint le lvl 10 ! T'es ailes brûlent car tu es beaucoup trop proche du soleil.\n C'est une excellente nouvelle pour toi : Tu peux dorénavant faire ta demande de certification en ouvrant un ticket sur le serveur et avoir ainsi accès à des salons secrets qui risque de te mettre en émoi :speak_no_evil: ")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -180,7 +180,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 50" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee = (f"Hey" + str(message.author.name) +"! Tu passes au niveau "+ str(levell + 1) + "! Merci d'être encore parmi nous et surtout, garde ta bonne humeur ! :grinning:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -189,7 +189,7 @@ async def on_message(message):
                             change_level_ecrit = "UPDATE USERS set level_ecrit = level_ecrit" + "+ 1" +  " where id=" +  str(str_tmp)+ ";"
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 90" +  " where id=" +  str(str_tmp)+ ";"
                             messagee = (f"Hey" + str(message.author.name) + "! Tu passes au niveau "+ str(levell + 1) + "! Merci d'être encore parmi nous et surtout, garde ta bonne humeur ! :grinning:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -200,7 +200,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 140" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee =(f"Hey" + str(message.author.name) + " ! Tu passes au niveau " + str(levell + 1) + " ! Continue de monter comme ça et tu deviendra bientôt un dinosaure :sauropod:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -210,7 +210,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 200" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee =(f"Hey" + str(message.author.name) + " ! Tu passes au niveau " + str(levell + 1) + " ! Continue de monter comme ça et tu deviendra bientôt un dinosaure :sauropod:. Pour passer level 50, il faut que tu passes 20h en vocal")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             return()
 
                         if (levell  == 49 and xp >= 200 and level_xp >= 180000):
@@ -218,7 +218,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 200" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee =(f (str(message.author.name)) + ", tu as atteint le lvl 50. Un merci sincère de notre part. Tu obtiens le rôle Ancien. Lorsque tu postes un lien maintenant, cela sera très bien présenté. Et cela, en permanence :heart:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -228,7 +228,7 @@ async def on_message(message):
                             change_xp_ecrit =  "UPDATE USERS set xp = xp" + "- 300" +  " where id=" +  str(str_tmp)+ ";"
 
                             messagee =(f"Salut l'ancien ! Tu passes au niveau "+  str(levell + 1) + " ! Tiens donc, ne serait-ce pas un cheveux blanc qui pousse ? :older_adult:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             curr.execute(change_level_ecrit)
                             curr.execute(change_xp_ecrit)
                             return()
@@ -236,7 +236,7 @@ async def on_message(message):
 
                         if (levell >= 70 and xp == 1):
                             messagee =(f (str(message.author.name)) + "! INCROYABLE ! Tu as atteint le niveau 70, c'est le niveau maximum ! Tu es devenu un dinosaure :sauropod: Du coup une récompense spéciale s'offre à toi. Envoie un message privé au fondateur ! :partying_face:")
-                            await client.send_message(user, messagee)
+                            await message.author.send(messagee)
                             return()
 
 
@@ -332,6 +332,5 @@ async def on_member_remove(member):
         cur.execute("SELECT * FROM USERS")
 
 
-
-bot.run("NzcyMDk0NzY5NTcxOTU0NzI4.X51rSQ.VGjARcYZb4GLfet5MJ9h82OeoMQ")
+bot.run("token")
 
